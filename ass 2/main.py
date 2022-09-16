@@ -13,6 +13,3 @@ def get_time_till_collision(x1, v1, x2, v2):
     if -(x2 - x1) / (v2 - v1) < 0:
         return float('inf')
     return -(x2 - x1) / (v2 - v1)
-
-
-print(get_time_till_collision(1, 1, 2, 2))
