@@ -16,7 +16,9 @@ def get_time_till_collision(x1, v1, x2, v2):
 
 
 def rounded(collisions):
-    return [(round(i[0], 4), i[1], round(i[2], 4))
+    # return [(round(i[0], 4), i[1], round(i[2], 4))
+    #         for i in collisions]
+    return [(float("%.4f" % i[0]), i[1], float("%.4f" % i[2]))
             for i in collisions]
 
 
