@@ -1,4 +1,4 @@
-import a2
+import main_numpy
 import time
 import pickle
 
@@ -29,7 +29,7 @@ def compare(out, check):
 
 
 print("Checking Function")
-if a2.listCollisions([1, 1, 1, 1, 1, 1],
+if main_numpy.listCollisions([1, 1, 1, 1, 1, 1],
                      [0, 1, 2, 3, 4, 5],
                      [1, 0, 1, 0, 1, 0],
                      8,
@@ -38,13 +38,13 @@ if a2.listCollisions([1, 1, 1, 1, 1, 1],
     # print("Checking Normal Cases...")
     # st = time.time()
     # for i in test:
-    #     out.append(a2.listCollisions(i[0], i[1], i[2], i[3], i[4]))
+    #     out.append(main_numpy.listCollisions(i[0], i[1], i[2], i[3], i[4]))
     # print("Time taken: ", time.time()-st)
     # print()
     # print("Checking Large Cases...")
     # st = time.time()
     # for i in test2:
-    #     out.append(a2.listCollisions(i[0], i[1], i[2], i[3], i[4]))
+    #     out.append(main_numpy.listCollisions(i[0], i[1], i[2], i[3], i[4]))
     # print("Time taken: ", time.time()-st)
 
     print()
@@ -52,8 +52,8 @@ if a2.listCollisions([1, 1, 1, 1, 1, 1],
     st = time.time()
     for i in test3:
         print(len(i[0]), i[3])
-        out.append(a2.listCollisions(i[0], i[1], i[2], i[3], i[4]))
-        print("*", end='')
+        out.append(main_numpy.listCollisions(i[0], i[1], i[2], i[3], i[4]))
+        print("*")
     print("Time taken: ", time.time()-st)
     print()
 
