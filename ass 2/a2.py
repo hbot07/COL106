@@ -16,9 +16,7 @@ def get_time_till_collision(x1, v1, x2, v2):
 
 
 def rounded(collisions):
-    # return [(round(i[0], 4), i[1], round(i[2], 4))
-    #         for i in collisions]
-    return [(float("%.4f" % i[0]), i[1], float("%.4f" % i[2]))
+    return [(round(i[0], 4), i[1], round(i[2], 4))
             for i in collisions]
 
 
@@ -26,12 +24,12 @@ def listCollisions(M, x, v, m, T):
     collisions = []
     current_time = 0
     colin = []
+    time_till_collision_list = [None for i in range(len(M)-1)]
     while m > len(collisions):
-        time_till_collision_list = []
-        for i in range(len(M) - 1):
-            time_till_collision_list.append(get_time_till_collision(x[i], v[i], x[i + 1], v[i + 1]))
         for i in colin:
             time_till_collision_list[i] = float('inf')
+        for i in range(len(M) - 1):
+            time_till_collision_list[i] = (get_time_till_collision(x[i], v[i], x[i + 1], v[i + 1]))
         colin = []
 
         min_index = 0
