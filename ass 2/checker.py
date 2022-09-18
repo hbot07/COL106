@@ -51,7 +51,9 @@ if a2.listCollisions([1, 1, 1, 1, 1, 1],
     print("Checking Other Cases...")
     st = time.time()
     for i in test3:
+        print(len(i[0]), i[3])
         out.append(a2.listCollisions(i[0], i[1], i[2], i[3], i[4]))
+        print("*", end='')
     print("Time taken: ", time.time()-st)
     print()
 
