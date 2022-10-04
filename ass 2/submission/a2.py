@@ -1,4 +1,106 @@
-import numpy as np
+import heapq
+
+"""
+Min Heap Implementation in Python
+"""
+
+
+class MinHeap:
+    def __init__(self):
+        """
+        On this implementation the heap list is initialized with a value
+        """
+        self.heap_list = [0]
+        self.current_size = 0
+
+    def sift_up(self, i):
+        """
+        Moves the value up in the tree to maintain the heap property.
+        """
+        # While the element is not the root or the left element
+        Stop = False
+        while (i // 2 > 0) and Stop == False:
+            # If the element is less than its parent swap the elements
+            if self.heap_list[i] < self.heap_list[i // 2]:
+                self.heap_list[i], self.heap_list[i // 2] = self.heap_list[i // 2], self.heap_list[i]
+                self.heap_list[i][3] = i
+                self.heap_list[i // 2][3] = i // 2
+                Stop = True
+            # Move the index to the parent to keep the properties
+            i = i // 2
+
+    def insert(self, k):
+        """
+        Inserts a value into the heap
+        """
+        # Append the element to the heap
+        self.heap_list.append(k)
+        # Increase the size of the heap.
+        self.current_size += 1
+        # Move the element to its position from bottom to the top
+        self.sift_up(self.current_size)
+
+    def sift_down(self, i):
+        # if the current node has at least one child
+        while (i * 2) <= self.current_size:
+            # Get the index of the min child of the current node
+            mc = self.min_child(i)
+            # Swap the values of the current element is greater than its min child
+            if self.heap_list[i] > self.heap_list[mc]:
+                self.heap_list[i], self.heap_list[mc] = self.heap_list[mc], self.heap_list[i]
+                self.heap_list[i][3] = i
+                self.heap_list[mc][3] = mc
+            i = mc
+
+    def min_child(self, i):
+        # If the current node has only one child, return the index of the unique child
+        if (i * 2) + 1 > self.current_size:
+            return i * 2
+        else:
+            # Herein the current node has two children
+            # Return the index of the min child according to their values
+            if self.heap_list[i * 2] < self.heap_list[(i * 2) + 1]:
+                return i * 2
+            else:
+                return (i * 2) + 1
+
+    def delete_min(self):
+        # Equal to 1 since the heap list was initialized with a value
+        if len(self.heap_list) == 1:
+            return 'Empty heap'
+
+        # Get root of the heap (The min value of the heap)
+        root = self.heap_list[1]
+
+        # Move the last value of the heap to the root
+        self.heap_list[1] = self.heap_list[self.current_size]
+
+        # Pop the last value since a copy was set on the root
+        *self.heap_list, _ = self.heap_list
+
+        # Decrease the size of the heap
+        self.current_size -= 1
+
+        # Move down the root (value at index 1) to keep the heap property
+        self.sift_down(1)
+
+        # Return the min value of the heap
+        return root
+
+    def build_heap(self, ar):
+        self.heap_list = [len(ar)] + ar
+        self.current_size = len(ar)
+        for i in range(len(self.heap_list) - 1, 0, -1):
+            self.sift_down(i)
+
+    def heapify(self, i):
+        self.sift_up(i)
+        self.sift_down(i)
+
+
+"""
+Driver program
+"""
 
 
 def get_final_velocities(m1, v1, m2, v2):
@@ -24,40 +126,54 @@ def rounded(collisions):
 
 
 def listCollisions(M, x, v, m, T):
+    my_heap = MinHeap()
     collisions = []
     current_time = 0
-    min_index = -10
-    time_till_collision_list = np.array([-1.0 for i in range(len(M) - 1)])
-    x = np.array(x)
-    v = np.array(v)
+    possible_collisions = []
+    X = [[i, 0] for i in x]
+    for i in range(len(M) - 1):
+        t = get_time_till_collision(x[i], v[i], x[i + 1], v[i + 1])
+        possible_collisions.append([t, i, x[i] + v[i] * t, i])
+    my_heap.build_heap(possible_collisions)
 
-    while m > len(collisions):
-        for i in range(len(M) - 1):
-            if time_till_collision_list[i] == -1:
-                time_till_collision_list[i] = get_time_till_collision(x[i], v[i], x[i + 1], v[i + 1])
-            if i == min_index:
-                time_till_collision_list[i] = float('inf')
-            if i == min_index - 1:
-                time_till_collision_list[i] = get_time_till_collision(x[i], v[i],
-                                                                      x[i + 1], v[i + 1])
-            if i == min_index + 1:
-                time_till_collision_list[i] = get_time_till_collision(x[i], v[i],
-                                                                      x[i + 1], v[i + 1])
+    while len(collisions) < m and current_time < T:
+        collision = my_heap.delete_min()  # pop
 
-        min_index = time_till_collision_list.argmin()
-
-        current_time += time_till_collision_list[min_index]
+        t = collision[0]
+        i = collision[1]
+        x = collision[2]
+        current_time = t
         if current_time > T:
             break
 
-        x = x + v * time_till_collision_list[min_index]
+        collisions.append(collision.copy())
 
-        v[min_index], v[min_index + 1] = get_final_velocities(M[min_index], v[min_index], M[min_index + 1],
-                                                              v[min_index + 1])
+        X[i][0], X[i][1] = X[i][0] + v[i] * (current_time - X[i][1]), current_time
+        X[i + 1][0], X[i + 1][1] = X[i + 1][0] + v[i + 1] * (current_time - X[i + 1][1]), current_time
 
-        collisions.append((current_time, min_index, x[min_index]))
-        time_till_collision_list = time_till_collision_list - \
-                                   time_till_collision_list[min_index]
+        collision[0] = float('inf')
+        v[i], v[i + 1] = get_final_velocities(M[i], v[i], M[i + 1],
+                                              v[i + 1])
+        collision[0] = float('inf')
+        collision[2] = float('inf')
+        
+        my_heap.insert(collision)
+
+        if i != 0:
+            X[i - 1][0], X[i - 1][1] = X[i - 1][0] + v[i - 1] * (current_time - X[i - 1][1]), current_time
+            temp1 = possible_collisions[i - 1]
+            t = get_time_till_collision(X[i - 1][0], v[i - 1], X[i][0], v[i])
+            temp1[0] = current_time + t
+            temp1[2] = X[i - 1][0] + v[i - 1] * t
+            my_heap.heapify(temp1[3])
+
+        if i != len(possible_collisions) - 1:
+            X[i + 2][0], X[i + 2][1] = X[i + 2][0] + v[i + 2] * (current_time - X[i + 2][1]), current_time
+            temp2 = possible_collisions[i + 1]
+            t = get_time_till_collision(X[i + 1][0], v[i + 1], X[i + 2][0], v[i + 2])
+            temp2[0] = current_time + t
+            temp2[2] = X[i + 1][0] + v[i + 1] * t
+            my_heap.heapify(temp2[3])
 
     return rounded(collisions)
 
