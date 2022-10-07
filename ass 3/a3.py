@@ -17,9 +17,6 @@ class BinaryTree:
             return self.root
         cursor = self.root
         while True:
-            if cursor.data == element:
-                print("duplicate found")
-                return
             if cursor.data > element:
                 if cursor.left is None:
                     cursor.left = Node(None, None, element, cursor)
@@ -42,17 +39,6 @@ class BinaryTree:
         if root is not None:
             self.in_order_helper(root.left, l)
             l.append(root.data)
-            self.in_order_helper(root.right, l)
-
-    def pre_order(self, root):
-        l = []
-        self.pre_order_helper(root, l)
-        return l
-
-    def pre_order_helper(self, root, l):
-        if root is not None:
-            l.append(root.data)
-            self.in_order_helper(root.left, l)
             self.in_order_helper(root.right, l)
 
     def between(self, lower_bound, upper_bound):
@@ -191,10 +177,51 @@ class AVLTree(BinaryTree):
         return self.update_heights(cursor.parent)
 
 
-# tree2 = AVLTree()
-# for i in [6, 4, 7, 9, 1]:
-#     tree2.insert(i)
-# tree2.print_tree()
-# print()
-# tree2.insert(3)
-# tree2.print_tree()
+class Point:
+    def __init__(self, point, cmp):
+        self.point = point
+        if cmp == 'x':
+            self.value = point
+        else:
+            self.value = point[::-1]
+
+    def __lt__(self, other):
+        return self.value < other.value
+
+    def __le__(self, other):
+        return self.value <= other.value
+
+    def __eq__(self, other):
+        return self.value == other.value
+
+    def __ne__(self, other):
+        return self.value != other.value
+
+    def __gt__(self, other):
+        return self.value > other.value
+
+    def __ge__(self, other):
+        return self.value >= other.value
+
+
+class PointDatabase:
+    def __init__(self, pointlist):
+        self.x = AVLTree()
+        self.y = AVLTree()
+        for point in pointlist:
+            self.x.insert(Point(point, 'x'))
+            self.y.insert(Point(point, 'y'))
+
+    def searchNearby(self, q, d):
+        xl = set(i.point for i in self.x.between(Point((q[0] - d, 0), 'x'),
+                                                 Point((q[0] + d, 0), 'x')))
+        yl = set(i.point for i in self.y.between(Point((0, q[1] - d), 'y'),
+                                                 Point((0, q[1] + d), 'y')))
+        return list(xl.intersection(yl))
+
+
+pointDbObject = PointDatabase([(1, 6), (2, 4), (3, 7), (4, 9), (5, 1), (6, 3), (7, 8), (8, 10),
+                               (9, 2), (10, 5)])
+print(pointDbObject.searchNearby((5, 5), 1),
+      pointDbObject.searchNearby((4, 8), 2),
+      pointDbObject.searchNearby((10, 2), 1.5), sep="\n")
